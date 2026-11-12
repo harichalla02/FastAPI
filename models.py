@@ -12,6 +12,12 @@ class Users(BaseModel):
     name: str
     email: str
     city: str
+
+class Customers(BaseModel):
+    id: int
+    name: str
+    email: str
+    city: str
     
 
     
