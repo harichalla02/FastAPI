@@ -45,9 +45,9 @@ def get_all_products(db: Session = Depends(get_db)):
     return products
 
 
-@app.get("/products/{product_id}")
-def get_product_by_id(product_id: int, db: Session = Depends(get_db)):
-    product = db.query(database_models.Product).filter(database_models.Product.id == product_id).first()
+@app.get("/products/{id}")
+def get_product_by_id(id: int, db: Session = Depends(get_db)):
+    product = db.query(database_models.Product).filter(database_models.Product.id == id).first()
     if product:
         return product
     return "Product not found"
@@ -59,9 +59,9 @@ def create_product(product: Product, db: Session = Depends(get_db)):
     return "Product created successfully"
 
 
-@app.put("/products/{product_id}")
-def update_product(product_id: int, product: Product, db: Session = Depends(get_db)):
-    db_product = db.query(database_models.Product).filter(database_models.Product.id == product_id).first()
+@app.put("/products/{id}")
+def update_product(id: int, product: Product, db: Session = Depends(get_db)):
+    db_product = db.query(database_models.Product).filter(database_models.Product.id == id).first()
     if not db_product:
        return "Product not found"
     db_product.name = product.name
@@ -72,11 +72,12 @@ def update_product(product_id: int, product: Product, db: Session = Depends(get_
     "Product updated successfully"
 
 
-@app.delete("/products/{product_id}")
-def delete_product(product_id: int, db: Session = Depends(get_db)):
-    db_product = db.query(database_models.Product).filter(database_models.Product.id == product_id).first()
+@app.delete("/products/{id}")
+def delete_product(id: int, db: Session = Depends(get_db)):
+    db_product = db.query(database_models.Product).filter(database_models.Product.id == id).first()
     if not db_product:
         return "Product not found"
     db.delete(db_product)
     db.commit()
     return "Product deleted successfully"
+
