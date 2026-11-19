@@ -29,13 +29,8 @@ def admin_register(admin: schemas.AdminCreate, db:Session = Depends(get_db)):
 
 
 @app.post("/admin/login")
-def admin_login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
-):
-    admin = db.query(databasemodels.Admin).filter(
-        databasemodels.Admin.username == form_data.username
-    ).first()
+def admin_login(db: Session = Depends(get_db),form_data: OAuth2PasswordRequestForm = Depends()):
+    admin = db.query(databasemodels.Admin).filter(databasemodels.Admin.username == form_data.username).first()
 
     if not admin:
         raise HTTPException(
@@ -43,18 +38,13 @@ def admin_login(
             detail="Invalid username or password"
         )
 
-    if not security.verify_password(
-        form_data.password,
-        admin.password
-    ):
+    if not security.verify_password(form_data.password,admin.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid username or password"
         )
 
-    access_token = security.create_access_token(
-        data={"sub": admin.username}
-    )
+    access_token = security.create_access_token(data={"sub": admin.username})
 
     return {
         "access_token": access_token,
