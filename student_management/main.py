@@ -4,7 +4,7 @@ import databasemodels
 from fastapi import FastAPI, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 import security
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordRequestForm
 from config import SECRET_KEY, ALGORITHM
 import jwt
 
@@ -48,49 +48,8 @@ def admin_login(db: Session = Depends(get_db),form_data: OAuth2PasswordRequestFo
 
     return {
         "access_token": access_token,
-        "token_type": "bearer"
+        "token_type": "Authorization->auth type->Bearer Token"
     }
-
-
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/admin/login"
-)
-
-
-def get_current_admin(
-    token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
-):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"}
-    )
-
-    try:
-        payload = jwt.decode(
-            token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
-        )
-
-        username = payload.get("sub")
-
-        if username is None:
-            raise credentials_exception
-
-    except jwt.InvalidTokenError:
-        raise credentials_exception
-
-    admin = db.query(databasemodels.Admin).filter(
-        databasemodels.Admin.username == username
-    ).first()
-
-    if admin is None:
-        raise credentials_exception
-
-    return admin
-
 
 
 @app.get('/students')
